@@ -1,8 +1,7 @@
 {
-  "author": "",
-  "name": "mmfc",
+  "author": "ninegene",
+  "name": "react-boilerplate",
   "version": "1.0.0",
-  "main": "index.js",
   "dependencies": {
     "bootstrap": "^3.3.2",
     "es5-shim": "^4.1.0",
