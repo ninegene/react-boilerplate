@@ -19,6 +19,7 @@ var isProd = gutil.env.type == 'production';
 var vendorPaths = [
   './node_modules/es5-shim/es5-sham.js',
   './node_modules/es5-shim/es5-shim.js',
+  './src/js/vendor/ie10-viewport-bug-workaround.js',
   './node_modules/bootstrap/dist/css/bootstrap.css',
   './node_modules/bootstrap/dist/css/bootstrap.css.map'
 ];
@@ -98,7 +99,7 @@ gulp.task('devServer', ['build'], function () {
     log('LiveReload listening on', lrPort);
   });
 
-  app = express()
+  app = express();
   app.use(connect_livereload());
   app.use(express.static(path.resolve("./dist")));
   app.listen(httpPort, function () {
