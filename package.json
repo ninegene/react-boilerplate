@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "help": "gulp npm-run-help",
-    "dev": "gulp devServer",
+    "dev": "gulp dev-server",
     "dev-build": "gulp build",
     "clean": "gulp clean",
     "build": "gulp --type production build"

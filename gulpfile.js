@@ -90,7 +90,7 @@ function copyOtherAssets() {
 
 if (isProd) {
   // wait for 'clean' task completion before running 'js', 'css', 'copy:*' tasks
-  gulp.task('clean', buildJS);
+  gulp.task('clean', cleanBuild);
   gulp.task('js', ['clean'], buildJS);
   gulp.task('css', ['clean'], buildCSS);
   gulp.task('copy:html', ['clean'], copyHTML);
@@ -98,7 +98,7 @@ if (isProd) {
   gulp.task('copy:assets', ['clean'], copyOtherAssets);
   gulp.task('build', ['clean', 'js', 'css', 'copy:html', 'copy:vendor', 'copy:assets']);
 } else {
-  gulp.task('clean', buildJS);
+  gulp.task('clean', cleanBuild);
   gulp.task('js', buildJS);
   gulp.task('css', buildCSS);
   gulp.task('copy:html', copyHTML);
@@ -107,7 +107,7 @@ if (isProd) {
   gulp.task('build', ['js', 'css', 'copy:html', 'copy:vendor', 'copy:assets']);
 }
 
-gulp.task('devServer', ['build'], function () {
+gulp.task('dev-server', ['build'], function () {
   var lrPort = 35729;
   liveReload = tiny_lr();
   liveReload.listen(lrPort, function () {
@@ -139,7 +139,7 @@ gulp.task('default', function () {
   log("* gulp build                   (development build)");
   log("* gulp clean                   (clean build: rm dist/**/*)");
   log("* gulp --type production build (production build)");
-  log("* gulp devServer               (build and run dev server)");
+  log("* gulp dev-server               (build and run dev server)");
   log("*********************************************************");
 });
 
