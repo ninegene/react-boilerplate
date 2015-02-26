@@ -34,7 +34,7 @@ var webpack = require('webpack');
 var webpackConfig = require('./webpack.config.js');
 if (isProd) {
   webpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin());
-  webpackConfig.output.filename = '[name]-[hash].js';
+  //webpackConfig.output.filename = '[name]-[hash].js';
 }
 var webpackCompiler = webpack(webpackConfig);
 
@@ -42,28 +42,13 @@ var httpPort = gutil.env.port ? gutil.env.port : 4000;
 
 // *** Tasks ***
 
-gulp.task('clean', function (cb) {
+// pass in callback as argument as async run hints
+// See: https://github.com/gulpjs/gulp/blob/master/docs/API.md#async-task-support
+function cleanBuild(cb) {
   del(['dist/*'], cb);
-});
+}
 
-gulp.task('copy:html', function () {
-  gulp.src('src/*.html')
-    .pipe(gulp.dest('dist/'));
-});
-
-gulp.task('copy:vendor', function () {
-  gulp.src(vendorPaths)
-    .pipe(gulp.dest('dist/assets/vendor'));
-});
-
-gulp.task('copy:assets', function () {
-  gulp.src(assetsPaths)
-    .pipe(gulp.dest('dist/assets'));
-});
-
-gulp.task('copy', ['copy:html', 'copy:vendor', 'copy:assets']);
-
-gulp.task('js', function (cb) {
+function buildJS(cb) {
   webpackCompiler.run(function(err, stats) {
     var timeTaken = stats.endTime - stats.startTime;
     log("webpack takes " + (timeTaken / 1000) + " s" );
@@ -74,22 +59,52 @@ gulp.task('js', function (cb) {
     }
   });
   cb();
-});
+}
 
-gulp.task('css', function () {
+// return stream as async run hints
+// See: https://github.com/gulpjs/gulp/blob/master/docs/API.md#async-task-support
+function buildCSS() {
   var sassConfig = { includePaths: ['src/css'] };
 
-  gulp.src('src/css/main.sass')
+  return gulp.src('src/css/main.sass')
     .pipe(sass(sassConfig).on('error', log))
     .pipe(isProd ? minifyCSS() : noop())
-    .pipe(isProd ? rev() : noop())
+    //.pipe(isProd ? rev() : noop())
     .pipe(gulp.dest('dist/assets'));
-});
+}
+
+function copyHTML() {
+  return gulp.src('src/*.html')
+    .pipe(gulp.dest('dist/'));
+}
+
+function copyVendor() {
+  return gulp.src(vendorPaths)
+    .pipe(gulp.dest('dist/assets/vendor'));
+}
+
+function copyOtherAssets() {
+  return gulp.src(assetsPaths)
+    .pipe(gulp.dest('dist/assets'));
+}
 
 if (isProd) {
-  gulp.task('build', ['clean', 'js', 'css', 'copy']);
+  // wait for 'clean' task completion before running 'js', 'css', 'copy:*' tasks
+  gulp.task('clean', buildJS);
+  gulp.task('js', ['clean'], buildJS);
+  gulp.task('css', ['clean'], buildCSS);
+  gulp.task('copy:html', ['clean'], copyHTML);
+  gulp.task('copy:vendor', ['clean'], copyVendor);
+  gulp.task('copy:assets', ['clean'], copyOtherAssets);
+  gulp.task('build', ['clean', 'js', 'css', 'copy:html', 'copy:vendor', 'copy:assets']);
 } else {
-  gulp.task('build', ['js', 'css', 'copy']);
+  gulp.task('clean', buildJS);
+  gulp.task('js', buildJS);
+  gulp.task('css', buildCSS);
+  gulp.task('copy:html', copyHTML);
+  gulp.task('copy:vendor', copyVendor);
+  gulp.task('copy:assets', copyOtherAssets);
+  gulp.task('build', ['js', 'css', 'copy:html', 'copy:vendor', 'copy:assets']);
 }
 
 gulp.task('devServer', ['build'], function () {
@@ -122,8 +137,18 @@ gulp.task('devServer', ['build'], function () {
 gulp.task('default', function () {
   log("*********************************************************");
   log("* gulp build                   (development build)");
-  log("* gulp clean                   (rm dist/**/*)");
+  log("* gulp clean                   (clean build: rm dist/**/*)");
   log("* gulp --type production build (production build)");
   log("* gulp devServer               (build and run dev server)");
+  log("*********************************************************");
+});
+
+// See package.json scripts property values
+gulp.task('npm-run-help', function () {
+  log("*********************************************************");
+  log("* npm run dev-build            (development build)");
+  log("* npm run clean                (clean build: rm dist/**/*)");
+  log("* npm run build                (production build)");
+  log("* npm run dev                  (build and run dev server)");
   log("*********************************************************");
 });

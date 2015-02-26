@@ -1,6 +1,5 @@
 ## Setup
 ```
-$ npm install gulp -g
 $ git clone https://github.com/ninegene/react-boilerplate.git myproject
 $ cd myproject
 $ npm install
@@ -9,19 +8,23 @@ $ npm install
 ## Developing
 Run dev http server and live reload browser on src files changes
 ```bash
-$ gulp devServer
+$ npm run dev
 ```
 
 ## Help
 ```bash
-$ gulp
-[01:30:17] Using gulpfile ~/Projects/react-boilerplate/gulpfile.js
-[01:30:17] Starting 'default'...
-[01:30:17] *********************************************************
-[01:30:17] * gulp build                   (development build)
-[01:30:17] * gulp clean                   (rm dist/**/*)
-[01:30:17] * gulp --type production build (production build)
-[01:30:17] * gulp devServer               (build and run dev server)
-[01:30:17] *********************************************************
-[01:30:17] Finished 'default' after 1.09 ms
+$ npm run help
+
+> react-boilerplate@1.0.0 help /home/aung/Projects/react-boilerplate
+> gulp npm-run-help
+
+[23:48:55] Using gulpfile ~/Projects/react-boilerplate/gulpfile.js
+[23:48:55] Starting 'npm-run-help'...
+[23:48:55] *********************************************************
+[23:48:55] * npm run dev-build            (development build)
+[23:48:55] * npm run clean                (clean build: rm dist/**/*)
+[23:48:55] * npm run build                (production build)
+[23:48:55] * npm run dev                  (build and run dev server)
+[23:48:55] *********************************************************
+[23:48:55] Finished 'npm-run-help' after 461 μs
 ```
