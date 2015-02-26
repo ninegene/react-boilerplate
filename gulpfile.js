@@ -3,10 +3,7 @@ var gulp = require('gulp');
 var del = require('del');
 var sass = require('gulp-sass');
 var minifyCSS = require('gulp-minify-css');
-// Static asset revisioning by appending content hash to filenames
-// main.css →  main-098f6bcd.css
-// Make sure to set the files to never expire for this to have an effect
-var rev = require('gulp-rev');
+var concat = require('gulp-concat');
 var express = require('express');
 var connect_livereload = require('connect-livereload');
 var tiny_lr = require('tiny-lr');
@@ -16,12 +13,15 @@ var noop = gutil.noop;
 
 // $ gulp --type production
 var isProd = gutil.env.type == 'production';
-var vendorPaths = [
-  './node_modules/es5-shim/es5-sham.js',
-  './node_modules/es5-shim/es5-shim.js',
-  './src/js/vendor/ie10-viewport-bug-workaround.js',
-  './node_modules/bootstrap/dist/css/bootstrap.css',
-  './node_modules/bootstrap/dist/css/bootstrap.css.map'
+var vendorJsPaths = [
+  './src/js/vendor/ie10-viewport-bug-workaround.js'
+];
+var vendorCssPaths = [
+  './node_modules/bootstrap/dist/css/bootstrap.min.css'
+];
+var fontsPaths = [
+  './src/fonts/*',
+  './node_modules/bootstrap/dist/fonts/*'
 ];
 var assetsPaths = [
   // all except html, js and css files
@@ -37,6 +37,7 @@ if (isProd) {
   //webpackConfig.output.filename = '[name]-[hash].js';
 }
 var webpackCompiler = webpack(webpackConfig);
+console.log(webpackConfig.plugins);
 
 var httpPort = gutil.env.port ? gutil.env.port : 4000;
 
@@ -48,11 +49,11 @@ function cleanBuild(cb) {
   del(['dist/*'], cb);
 }
 
-function buildJS(cb) {
+function buildJs(cb) {
   webpackCompiler.run(function(err, stats) {
     var timeTaken = stats.endTime - stats.startTime;
+    //log(stats.toString({colors: true}));
     log("webpack takes " + (timeTaken / 1000) + " s" );
-    log(stats.toString({colors: true}));
 
     if (err) {
       throw new gutil.PluginError('webpack', err);
@@ -63,48 +64,63 @@ function buildJS(cb) {
 
 // return stream as async run hints
 // See: https://github.com/gulpjs/gulp/blob/master/docs/API.md#async-task-support
-function buildCSS() {
+function compileSass() {
   var sassConfig = { includePaths: ['src/css'] };
 
   return gulp.src('src/css/main.sass')
     .pipe(sass(sassConfig).on('error', log))
     .pipe(isProd ? minifyCSS() : noop())
-    //.pipe(isProd ? rev() : noop())
-    .pipe(gulp.dest('dist/assets'));
+    .pipe(gulp.dest('dist/assets/css/'));
 }
 
-function copyHTML() {
+function concatVendorJs() {
+  return gulp.src(vendorJsPaths)
+    .pipe(concat('vendor.js'))
+    .pipe(gulp.dest('dist/assets/js/'));
+}
+
+function concatVendorCss() {
+  return gulp.src(vendorCssPaths)
+    .pipe(concat('vendor.css'))
+    .pipe(gulp.dest('dist/assets/css/'));
+}
+
+function copyHtml() {
   return gulp.src('src/*.html')
     .pipe(gulp.dest('dist/'));
 }
 
-function copyVendor() {
-  return gulp.src(vendorPaths)
-    .pipe(gulp.dest('dist/assets/vendor'));
+function copyFonts() {
+  return gulp.src(fontsPaths)
+    .pipe(gulp.dest('dist/assets/fonts/'));
 }
 
-function copyOtherAssets() {
+function copyAssets() {
   return gulp.src(assetsPaths)
-    .pipe(gulp.dest('dist/assets'));
+    .pipe(gulp.dest('dist/assets/'));
 }
+
+gulp.task('clean', cleanBuild);
 
 if (isProd) {
   // wait for 'clean' task completion before running 'js', 'css', 'copy:*' tasks
-  gulp.task('clean', cleanBuild);
-  gulp.task('js', ['clean'], buildJS);
-  gulp.task('css', ['clean'], buildCSS);
-  gulp.task('copy:html', ['clean'], copyHTML);
-  gulp.task('copy:vendor', ['clean'], copyVendor);
-  gulp.task('copy:assets', ['clean'], copyOtherAssets);
-  gulp.task('build', ['clean', 'js', 'css', 'copy:html', 'copy:vendor', 'copy:assets']);
+  gulp.task('js:main', ['clean'], buildJs);
+  gulp.task('js:vendor', ['clean'], concatVendorJs);
+  gulp.task('css:main', ['clean'], compileSass);
+  gulp.task('css:vendor', ['clean'], concatVendorCss);
+  gulp.task('copy:html', ['clean'], copyHtml);
+  gulp.task('copy:fonts', ['clean'], copyFonts);
+  gulp.task('copy:assets', ['clean'], copyAssets);
+  gulp.task('build', ['clean', 'js:main', 'js:vendor', 'css:main', 'css:vendor', 'copy:html', 'copy:fonts', 'copy:assets']);
 } else {
-  gulp.task('clean', cleanBuild);
-  gulp.task('js', buildJS);
-  gulp.task('css', buildCSS);
-  gulp.task('copy:html', copyHTML);
-  gulp.task('copy:vendor', copyVendor);
-  gulp.task('copy:assets', copyOtherAssets);
-  gulp.task('build', ['js', 'css', 'copy:html', 'copy:vendor', 'copy:assets']);
+  gulp.task('js:main', buildJs);
+  gulp.task('js:vendor', concatVendorJs);
+  gulp.task('css:main', compileSass);
+  gulp.task('css:vendor', concatVendorCss);
+  gulp.task('copy:html', copyHtml);
+  gulp.task('copy:fonts', copyFonts);
+  gulp.task('copy:assets', copyAssets);
+  gulp.task('build', ['js:main', 'js:vendor', 'css:main', 'css:vendor', 'copy:html', 'copy:fonts', 'copy:assets']);
 }
 
 gulp.task('dev-server', ['build'], function () {

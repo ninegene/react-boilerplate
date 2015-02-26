@@ -10,8 +10,8 @@ var webpackConfig = {
     //main2: baseDir + '/src/js/main2.js',
   },
   output: {
-    path: baseDir + '/dist/assets', //path.join(__dirname, 'dist', 'assets'),
-    publicPath: '/assets',
+    path: baseDir + '/dist/assets/js', //path.join(__dirname, 'dist', 'assets'),
+    publicPath: '/assets/js',
     filename: '[name].js', // '[name]-[hash].js' for production
     chunkFilename: '[chunkhash].js'
   },
@@ -33,7 +33,11 @@ var webpackConfig = {
     noParse: /\.min\.js/
   },
   plugins: [
-
+    new webpack.ProvidePlugin({
+      _: "lodash",
+      $: "jquery",
+      jQuery: "jquery",
+    })
   ]
 };
 
