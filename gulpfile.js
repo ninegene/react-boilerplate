@@ -137,9 +137,8 @@ gulp.task('dev-server', ['build'], function () {
     log('HTTP server listening on', httpPort);
   });
 
-  gulp.watch(['./src/**/*'], function (event) {
-    gulp.run('build');
-  });
+  gulp.watch(['./src/**/*.js'], ['js:main']);
+  gulp.watch(['./src/**/*.sass'], ['css:main']);
 
   gulp.watch(['./dist/**/*'], function (event) {
     var fileName = event.path;
