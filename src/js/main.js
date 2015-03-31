@@ -10,6 +10,8 @@ var {
   Link
 } = Router;
 
+// These components need to be moved to individual jsx file inside components directory
+
 var App = React.createClass({
 
   mixins: [Router.State],
