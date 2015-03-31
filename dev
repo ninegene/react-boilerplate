@@ -3,4 +3,5 @@ set -e
 BASE_DIR=$(cd "$(dirname "$(readlink -f "$0")")" && pwd)
 cd "$BASE_DIR"
 
+npm install
 npm run dev-server

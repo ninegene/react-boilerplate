@@ -123,6 +123,7 @@ gulp.task('dev-server', ['dev-build'], function () {
   app.use(express.static(path.resolve("./dist")));
   app.listen(httpPort, function () {
     log('HTTP server listening on', httpPort);
+    log('Browse to http://localhost:' + httpPort);
   });
 
   gulp.watch(['./src/**/*.js'], ['js:main']);

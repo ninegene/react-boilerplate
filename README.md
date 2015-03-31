@@ -8,7 +8,11 @@ $ npm install
 ## Developing
 Run dev http server and live reload browser on src files changes
 ```bash
-$ npm run dev
+$ ./dev
+
+OR
+
+$ ./npm run dev-server
 ```
 
 ## Help
