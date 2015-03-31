@@ -108,9 +108,10 @@ gulp.task('css:vendor', concatVendorCss);
 gulp.task('copy:html', copyHtml);
 gulp.task('copy:fonts', copyFonts);
 gulp.task('copy:assets', copyAssets);
-gulp.task('build', ['clean', 'js:main', 'js:vendor', 'css:main', 'css:vendor', 'copy:html', 'copy:fonts', 'copy:assets']);
+gulp.task('dev-build', ['js:main', 'js:vendor', 'css:main', 'css:vendor', 'copy:html', 'copy:fonts', 'copy:assets']);
+gulp.task('build', ['clean', 'dev-build']);
 
-gulp.task('dev-server', ['build'], function () {
+gulp.task('dev-server', ['dev-build'], function () {
   var lrPort = 35729;
   liveReload = tiny_lr();
   liveReload.listen(lrPort, function () {
@@ -136,21 +137,21 @@ gulp.task('dev-server', ['build'], function () {
   });
 });
 
-gulp.task('help', function () {
+gulp.task('default', function () {
   log("*********************************************************");
-  log("* gulp build                   (development build)");
+  log("* gulp dev-server              (build and run dev server)");
+  log("* gulp dev-build               (development build)");
   log("* gulp clean                   (clean build: rm dist/**/*)");
   log("* gulp --type production build (production build)");
-  log("* gulp dev-server               (build and run dev server)");
   log("*********************************************************");
 });
 
 // See package.json scripts property values
-gulp.task('npm-run-help', function () {
+gulp.task('help', function () {
   log("*********************************************************");
+  log("* npm run dev-server           (build and run dev server)");
   log("* npm run dev-build            (development build)");
   log("* npm run clean                (clean build: rm dist/**/*)");
   log("* npm run build                (production build)");
-  log("* npm run dev                  (build and run dev server)");
   log("*********************************************************");
 });

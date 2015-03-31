@@ -21,10 +21,10 @@ $ npm run help
 [23:48:55] Using gulpfile ~/Projects/react-boilerplate/gulpfile.js
 [23:48:55] Starting 'npm-run-help'...
 [23:48:55] *********************************************************
+[23:48:55] * npm run dev-server           (build and run dev server)
 [23:48:55] * npm run dev-build            (development build)
 [23:48:55] * npm run clean                (clean build: rm dist/**/*)
 [23:48:55] * npm run build                (production build)
-[23:48:55] * npm run dev                  (build and run dev server)
 [23:48:55] *********************************************************
 [23:48:55] Finished 'npm-run-help' after 461 μs
 ```

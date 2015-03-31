@@ -3,9 +3,9 @@
   "name": "react-boilerplate",
   "version": "1.0.0",
   "scripts": {
-    "help": "gulp npm-run-help",
-    "dev": "gulp dev-server",
-    "dev-build": "gulp build",
+    "help": "gulp help",
+    "dev-server": "gulp dev-server",
+    "dev-build": "gulp dev-build",
     "clean": "gulp clean",
     "build": "gulp --type production build"
   },
