@@ -43,12 +43,12 @@ var httpPort = gutil.env.port ? gutil.env.port : 4000;
 
 // *** Tasks ***
 
-// pass in callback as argument as async run hints
-// See: https://github.com/gulpjs/gulp/blob/master/docs/API.md#async-task-support
-function cleanBuild(cb) {
-  del(['dist/*'], cb);
+function cleanBuild() {
+  del.sync(['dist/*']);
 }
 
+// pass in callback as argument as async run hints
+// See: https://github.com/gulpjs/gulp/blob/master/docs/API.md#async-task-support
 function buildJs(cb) {
   webpackCompiler.run(function(err, stats) {
     var timeTaken = stats.endTime - stats.startTime;
@@ -73,16 +73,16 @@ function compileSass() {
     .pipe(gulp.dest('dist/assets/css/'));
 }
 
-function concatVendorJs() {
-  return gulp.src(vendorJsPaths)
-    .pipe(concat('vendor.js'))
-    .pipe(gulp.dest('dist/assets/js/'));
-}
-
 function concatVendorCss() {
   return gulp.src(vendorCssPaths)
     .pipe(concat('vendor.css'))
     .pipe(gulp.dest('dist/assets/css/'));
+}
+
+function concatVendorJs() {
+  return gulp.src(vendorJsPaths)
+    .pipe(concat('vendor.js'))
+    .pipe(gulp.dest('dist/assets/js/'));
 }
 
 function copyHtml() {
@@ -101,27 +101,14 @@ function copyAssets() {
 }
 
 gulp.task('clean', cleanBuild);
-
-if (isProd) {
-  // wait for 'clean' task completion before running 'js', 'css', 'copy:*' tasks
-  gulp.task('js:main', ['clean'], buildJs);
-  gulp.task('js:vendor', ['clean'], concatVendorJs);
-  gulp.task('css:main', ['clean'], compileSass);
-  gulp.task('css:vendor', ['clean'], concatVendorCss);
-  gulp.task('copy:html', ['clean'], copyHtml);
-  gulp.task('copy:fonts', ['clean'], copyFonts);
-  gulp.task('copy:assets', ['clean'], copyAssets);
-  gulp.task('build', ['clean', 'js:main', 'js:vendor', 'css:main', 'css:vendor', 'copy:html', 'copy:fonts', 'copy:assets']);
-} else {
-  gulp.task('js:main', buildJs);
-  gulp.task('js:vendor', concatVendorJs);
-  gulp.task('css:main', compileSass);
-  gulp.task('css:vendor', concatVendorCss);
-  gulp.task('copy:html', copyHtml);
-  gulp.task('copy:fonts', copyFonts);
-  gulp.task('copy:assets', copyAssets);
-  gulp.task('build', ['js:main', 'js:vendor', 'css:main', 'css:vendor', 'copy:html', 'copy:fonts', 'copy:assets']);
-}
+gulp.task('js:main', buildJs);
+gulp.task('js:vendor', concatVendorJs);
+gulp.task('css:main', compileSass);
+gulp.task('css:vendor', concatVendorCss);
+gulp.task('copy:html', copyHtml);
+gulp.task('copy:fonts', copyFonts);
+gulp.task('copy:assets', copyAssets);
+gulp.task('build', ['clean', 'js:main', 'js:vendor', 'css:main', 'css:vendor', 'copy:html', 'copy:fonts', 'copy:assets']);
 
 gulp.task('dev-server', ['build'], function () {
   var lrPort = 35729;
@@ -149,7 +136,7 @@ gulp.task('dev-server', ['build'], function () {
   });
 });
 
-gulp.task('default', function () {
+gulp.task('help', function () {
   log("*********************************************************");
   log("* gulp build                   (development build)");
   log("* gulp clean                   (clean build: rm dist/**/*)");
